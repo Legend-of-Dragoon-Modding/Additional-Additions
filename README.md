@@ -2,7 +2,7 @@
 This mod allows you to use new additions for [Legend of Dragoon: Severed Chains](https://legendofdragoon.org/projects/severed-chains) created using the [Additional Additions Editor](https://github.com/Legend-of-Dragoon-Modding/Additional-Additions-Editor).
 
 ## How to Install
-Download the mod from the releases page of this repository and extract it into your Severed Chains `mods` folder.
+Download the mod (.jar) from the releases page of this repository and put it in your Severed Chains `mods` folder.
 
 ## How to Use
 1. Install the mod (see previous section for installation instructions)
