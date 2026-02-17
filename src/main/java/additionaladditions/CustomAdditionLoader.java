@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class CustomAdditionLoader {
@@ -50,7 +51,7 @@ public class CustomAdditionLoader {
             final JsonObject json = SERIALIZER.fromJson(contents, JsonObject.class);
             final RegistryId charRegId = new RegistryId(json.getAsJsonPrimitive("char_id").getAsString());
             final String filename = path.getFileName().toString();
-            additions.computeIfAbsent(charRegId, key -> new ArrayList<>()).add(new CustomAddition(json, 4031 + CHAR_IDS.indexOf(charRegId) * 8, filename.substring(0, filename.length() - 5)));
+            additions.computeIfAbsent(charRegId, key -> new ArrayList<>()).add(new CustomAddition(json, 4031 + CHAR_IDS.indexOf(charRegId) * 8, filename.substring(0, filename.length() - 5).toLowerCase(Locale.ROOT)));
           } catch(final Throwable t) {
             LOGGER.error("Failed to load addition " + path, t);
           }

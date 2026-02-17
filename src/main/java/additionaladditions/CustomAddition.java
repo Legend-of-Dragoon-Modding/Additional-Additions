@@ -22,7 +22,7 @@ public class CustomAddition extends SimpleAddition {
   private final String name;
   private final String[] animationFiles;
 
-  public CustomAddition(final JsonObject obj, final int baseAnimationPackage, String id) {
+  public CustomAddition(final JsonObject obj, final int baseAnimationPackage, final String id) {
     this.baseAnimationPackage = baseAnimationPackage;
 
     this.name = obj.getAsJsonPrimitive("name").getAsString();
