@@ -1,6 +1,5 @@
 package additionaladditions;
 
-import legend.game.additions.Addition;
 import legend.game.additions.AdditionRegistryEvent;
 import legend.game.additions.CharacterAdditionStats;
 import legend.game.additions.UnlockState;
@@ -23,7 +22,7 @@ public class AdditionalAdditionsMod {
 
   private final CustomAdditionLoader customAdditionLoader = new CustomAdditionLoader();
 
-  private final Map<RegistryId, List<Addition>> additions = new HashMap<>();
+  private final Map<RegistryId, List<CustomAddition>> additions = new HashMap<>();
 
   public AdditionalAdditionsMod() {
     EVENTS.register(this);
@@ -39,11 +38,11 @@ public class AdditionalAdditionsMod {
     this.additions.putAll(this.customAdditionLoader.loadAllAsAdditions());
 
     for(final RegistryId charId : CustomAdditionLoader.CHAR_IDS) {
-      final List<Addition> additions = this.additions.get(charId);
+      final List<CustomAddition> additions = this.additions.get(charId);
 
       if(additions != null) {
-        for(int i = 0; i < additions.size(); i++) {
-          event.register(id(charId.entryId() + '_' + i), additions.get(i));
+        for(final CustomAddition addition : additions) {
+          event.register(id(charId.entryId() + '_' + addition.id), addition);
         }
       }
     }
@@ -52,12 +51,12 @@ public class AdditionalAdditionsMod {
   @EventListener
   public void onGameLoaded(final GameLoadedEvent event) {
     for(int i = 0; i < CustomAdditionLoader.CHAR_IDS.size(); i++) {
-      final List<Addition> additions = this.additions.get(CustomAdditionLoader.CHAR_IDS.get(i));
+      final List<CustomAddition> additions = this.additions.get(CustomAdditionLoader.CHAR_IDS.get(i));
 
       if(additions != null) {
         final CharacterData2c character = event.gameState.charData_32c[i];
 
-        for(final Addition addition : additions) {
+        for(final CustomAddition addition : additions) {
           if(!character.additionStats.containsKey(addition.getRegistryId())) {
             final CharacterAdditionStats stats = new CharacterAdditionStats();
             stats.unlockState = UnlockState.UNLOCKED;

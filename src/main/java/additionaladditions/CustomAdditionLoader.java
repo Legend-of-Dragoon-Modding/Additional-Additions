@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.ReflectionAccessFilter;
-import legend.game.additions.Addition;
 import legend.lodmod.LodMod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,8 +37,8 @@ public class CustomAdditionLoader {
     LodMod.id("miranda")
   );
 
-  public Map<RegistryId, List<Addition>> loadAllAsAdditions() {
-    final Map<RegistryId, List<Addition>> additions = new HashMap<>();
+  public Map<RegistryId, List<CustomAddition>> loadAllAsAdditions() {
+    final Map<RegistryId, List<CustomAddition>> additions = new HashMap<>();
 
     try {
       Files.createDirectories(ADDITION_DIR);
@@ -50,7 +49,8 @@ public class CustomAdditionLoader {
             final String contents = Files.readString(path, StandardCharsets.UTF_8);
             final JsonObject json = SERIALIZER.fromJson(contents, JsonObject.class);
             final RegistryId charRegId = new RegistryId(json.getAsJsonPrimitive("char_id").getAsString());
-            additions.computeIfAbsent(charRegId, key -> new ArrayList<>()).add(new CustomAddition(json, 4031 + CHAR_IDS.indexOf(charRegId) * 8));
+            final String filename = path.getFileName().toString();
+            additions.computeIfAbsent(charRegId, key -> new ArrayList<>()).add(new CustomAddition(json, 4031 + CHAR_IDS.indexOf(charRegId) * 8, filename.substring(0, filename.length() - 5)));
           } catch(final Throwable t) {
             LOGGER.error("Failed to load addition " + path, t);
           }

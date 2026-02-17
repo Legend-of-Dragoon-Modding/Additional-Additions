@@ -18,10 +18,11 @@ import static legend.game.DrgnFiles.loadDrgnDirSync;
 
 public class CustomAddition extends SimpleAddition {
   private final int baseAnimationPackage;
+  public final String id;
   private final String name;
   private final String[] animationFiles;
 
-  public CustomAddition(final JsonObject obj, final int baseAnimationPackage) {
+  public CustomAddition(final JsonObject obj, final int baseAnimationPackage, String id) {
     this.baseAnimationPackage = baseAnimationPackage;
 
     this.name = obj.getAsJsonPrimitive("name").getAsString();
@@ -43,6 +44,14 @@ public class CustomAddition extends SimpleAddition {
     for(int i = 0; i < hitsObj.size(); i++) {
       final JsonObject hitObj = hitsObj.get(i).getAsJsonObject();
       final String animation = hitObj.getAsJsonPrimitive("animation").getAsString();
+
+      final int interpolationScale;
+      if(hitObj.has("animation_scale")) {
+        interpolationScale = hitObj.getAsJsonPrimitive("animation_scale").getAsInt();
+      } else {
+        interpolationScale = 100;
+      }
+
       final int flags = hitObj.getAsJsonPrimitive("flags").getAsInt();
       final int audioFile = hitObj.getAsJsonPrimitive("audio_file").getAsInt();
       final int failAnimation = hitObj.getAsJsonPrimitive("fail_animation").getAsInt();
@@ -58,11 +67,13 @@ public class CustomAddition extends SimpleAddition {
       final int sp = hitObj.getAsJsonPrimitive("sp").getAsInt();
 
       hits[i] = new AdditionHitProperties10(flags, totalFrames, hitFrame, successFrames, damageMultiplier, sp, audioFile, i == hitsObj.size() - 1 ? 4 : 0, cameraMovementX, cameraMovementZ, cameraMovementTicks, distanceFromTarget, moveFrames, 0, failAnimation, overlayFrame);
+      hits[i].animationScale = interpolationScale;
 
       animationFiles[i] = animation;
     }
 
     super(baseDamage, levelMultipliers, hits);
+    this.id = id;
     this.animationFiles = animationFiles;
   }
 
