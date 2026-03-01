@@ -26,7 +26,6 @@ public class CustomAddition extends SimpleAddition {
     this.baseAnimationPackage = baseAnimationPackage;
 
     this.name = obj.getAsJsonPrimitive("name").getAsString();
-    final int baseDamage = obj.getAsJsonPrimitive("base_damage").getAsInt();
     final int overlayFrame = obj.getAsJsonPrimitive("overlay_frame").getAsInt();
 
     final JsonArray levelMultipliersObj = obj.getAsJsonArray("level_multipliers");
@@ -72,7 +71,7 @@ public class CustomAddition extends SimpleAddition {
       animationFiles[i] = animation;
     }
 
-    super(baseDamage, levelMultipliers, hits);
+    super(levelMultipliers, hits);
     this.id = id;
     this.animationFiles = animationFiles;
   }
