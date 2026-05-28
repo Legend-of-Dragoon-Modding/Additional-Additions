@@ -1,10 +1,9 @@
 package additionaladditions;
 
 import legend.game.additions.AdditionRegistryEvent;
-import legend.game.additions.CharacterAdditionStats;
-import legend.game.additions.UnlockState;
+import legend.game.characters.CharacterAdditionInfo;
+import legend.game.characters.CharacterData2c;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
-import legend.game.types.CharacterData2c;
 import org.legendofdragoon.modloader.Mod;
 import org.legendofdragoon.modloader.events.EventListener;
 import org.legendofdragoon.modloader.events.Priority;
@@ -54,13 +53,14 @@ public class AdditionalAdditionsMod {
       final List<CustomAddition> additions = this.additions.get(CustomAdditionLoader.CHAR_IDS.get(i));
 
       if(additions != null) {
-        final CharacterData2c character = event.gameState.charData_32c[i];
+        final CharacterData2c character = event.gameState.charData_32c.get(i);
 
-        for(final CustomAddition addition : additions) {
-          if(!character.additionStats.containsKey(addition.getRegistryId())) {
-            final CharacterAdditionStats stats = new CharacterAdditionStats();
-            stats.unlockState = UnlockState.UNLOCKED;
-            character.additionStats.put(addition.getRegistryId(), stats);
+        for(int additionIndex = 0; additionIndex < additions.size(); additionIndex++) {
+          final CustomAddition addition = additions.get(additionIndex);
+          if(character.getAdditionInfo(addition.getRegistryId()) == null) {
+            final CharacterAdditionInfo info = new CharacterAdditionInfo(List.of());
+            info.unlock(event.gameState.timestamp_a0 + additionIndex);
+            character.addAddition(addition.getRegistryId(), info);
           }
         }
       }

@@ -3,18 +3,16 @@ package additionaladditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import legend.game.additions.AdditionHitProperties10;
-import legend.game.additions.CharacterAdditionStats;
 import legend.game.additions.SimpleAddition;
-import legend.game.types.CharacterData2c;
-import legend.game.types.GameState52c;
+import legend.game.characters.CharacterAdditionInfo;
+import legend.game.characters.CharacterData2c;
 import legend.game.unpacker.FileData;
 import legend.game.unpacker.Loader;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
-import static legend.game.DrgnFiles.loadDrgnDirSync;
+import static legend.game.DrgnFiles.loadDrgnDir;
 
 public class CustomAddition extends SimpleAddition {
   private final int baseAnimationPackage;
@@ -71,7 +69,7 @@ public class CustomAddition extends SimpleAddition {
       animationFiles[i] = animation;
     }
 
-    super(levelMultipliers, hits);
+    super(false, levelMultipliers, hits);
     this.id = id;
     this.animationFiles = animationFiles;
   }
@@ -82,23 +80,21 @@ public class CustomAddition extends SimpleAddition {
   }
 
   @Override
-  public boolean isUnlocked(final GameState52c state, final CharacterData2c charData, final CharacterAdditionStats additionStats) {
-    return true;
-  }
+  public CompletableFuture<List<FileData>> loadAnimations(final CharacterData2c charData, final CharacterAdditionInfo additionInfo) {
+    final CompletableFuture<List<FileData>> baseAnimationsFuture = loadDrgnDir(0, this.baseAnimationPackage);
+    final CompletableFuture<List<FileData>> additionAnimationsFuture = Loader.loadFiles(this.animationFiles);
 
-  @Override
-  public void loadAnimations(final GameState52c state, final CharacterData2c charData, final CharacterAdditionStats additionStats, final Consumer<List<FileData>> onLoad) {
-    Loader.loadFiles(files -> this.onAnimationsLoaded(files, onLoad), this.animationFiles);
-  }
+    return CompletableFuture
+      .allOf(baseAnimationsFuture, additionAnimationsFuture)
+      .thenApply(v -> {
+        final List<FileData> baseAnimations = baseAnimationsFuture.join();
+        final List<FileData> additionAnimations = additionAnimationsFuture.join();
 
-  private void onAnimationsLoaded(final List<FileData> files, final Consumer<List<FileData>> onLoad) {
-    final List<FileData> baseAnimations = new ArrayList<>();
-    loadDrgnDirSync(0, this.baseAnimationPackage, baseAnimations::addAll);
+        for(int i = 0; i < additionAnimations.size(); i++) {
+          baseAnimations.set(16 + i, additionAnimations.get(i));
+        }
 
-    for(int i = 0; i < files.size(); i++) {
-      baseAnimations.set(16 + i, files.get(i));
-    }
-
-    onLoad.accept(baseAnimations);
+        return baseAnimations;
+      });
   }
 }
